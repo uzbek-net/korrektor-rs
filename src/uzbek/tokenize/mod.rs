@@ -41,21 +41,7 @@ const REPLACE_LAT: [(&str, &str); 2] = [
     ("[bdfghjklmnpqrstvxyzğšč]", "C")
 ];
 
-///
-/// Splits the word by syllables.
-///
-/// Given a String reference returns a new String
-/// containing the word separated by syllables with a delimiter.
-///
-/// # Example
-/// ```rust
-/// use korrektor::uzbek::tokenize;
-///
-/// let output = tokenize::split_word("chiroyli");
-/// let expected = "chi-roy-li".to_string();
-/// assert_eq!(output, expected);
-/// ```
-pub fn split_word(word: &str) -> String {
+fn split_word(word: &str) -> String {
     let mut result = a_correct(&word.to_string());
     result = result.trim().to_string();
     let mut last = result.clone();
@@ -111,6 +97,33 @@ pub fn split_word(word: &str) -> String {
     }
 
     i_correct(&result)
+}
+
+///
+/// Splits all the words in text by syllables.
+///
+/// Given a String reference returns a new String
+/// containing the words separated by syllables with a delimiter.
+/// Words in the input should be separated with a whitespace.
+/// Single word may be not padded with a whitespace.
+///
+/// # Example
+/// ```rust
+/// use korrektor::uzbek::tokenize;
+///
+/// let output = tokenize::split_text("singil chiroyli чиройли");
+/// let expected = "si-ngil chi-roy-li чи-рой-ли".to_string();
+/// assert_eq!(output, expected);
+/// ```
+pub fn split_text(text: &str) -> String{
+    let mut result = String::new();
+
+    let words = text.split_whitespace();
+    for word in words {
+        result = result + &split_word(word) + " ";
+    }
+
+    result.trim().to_string()
 }
 
 fn a_correct(text: &String) -> String {
@@ -253,5 +266,13 @@ mod as_tests {
         assert_eq!(split_word("singil"), "si-ngil");
         assert_eq!(split_word("chiroyli"), "chi-roy-li");
         assert_eq!(split_word("чиройли"), "чи-рой-ли");
+    }
+
+    #[test]
+    fn split_text_test() {
+        assert_eq!(split_text("singil chiroyli чиройли"), "si-ngil chi-roy-li чи-рой-ли");
+        assert_eq!(split_text("singil"), "si-ngil");
+        assert_eq!(split_text("chiroyli"), "chi-roy-li");
+        assert_eq!(split_text("чиройли"), "чи-рой-ли");
     }
 }
