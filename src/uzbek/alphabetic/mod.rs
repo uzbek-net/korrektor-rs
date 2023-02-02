@@ -154,10 +154,10 @@ fn sort_sortable(text: &str) -> String {
     let mut result = String::new();
     for word in sortable {
         result.push_str(word);
-        result.push('\n');
+        result.push(' ');
     }
 
-    result
+    result.trim().to_string()
 }
 
 fn is_exceptioned(value: char) -> bool {
@@ -211,7 +211,7 @@ mod as_tests {
     #[test]
     fn get_sorted_text_test() {
         let input = "G‘ozal estafeta chilonzor o'zbek chiroyli";
-        let output = String::from("estafeta\no‘zbek\nchilonzor\nchiroyli\nG‘ozal\n");
+        let output = String::from("estafeta o‘zbek chilonzor chiroyli G‘ozal");
         assert_eq!(sort(input), output)
     }
 }
