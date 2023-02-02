@@ -46,7 +46,7 @@ const FROM_SORT: [&str; 10] = [
 /// use korrektor::uzbek::alphabetic;
 ///
 /// let output = alphabetic::sort("G‘ozal estafeta chilonzor o'zbek chiroyli");
-/// let expected = "estafeta\no‘zbek\nchilonzor\nchiroyli\nG‘ozal\n".to_string();
+/// let expected = "estafeta o‘zbek chilonzor chiroyli G‘ozal".to_string();
 /// assert_eq!(output, expected);
 ///```
 pub fn sort(text: &str) -> String {
