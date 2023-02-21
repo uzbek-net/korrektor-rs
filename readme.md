@@ -1,5 +1,5 @@
 <header>
-<img src="https://raw.githubusercontent.com/uzinfocom-org/website/main/src/images/logo.svg" alt="logo" height="100" align="left">
+<img src="https://raw.githubusercontent.com/uzinfocom-org/website/main/public/favicons/pinned.svg" alt="logo" height="100" align="left">
 <h1 style="display: inline">Korrektor Rust Lib</h1>
 
 Dasturlar endilikda O'zbek tilini ham tushunadi!
