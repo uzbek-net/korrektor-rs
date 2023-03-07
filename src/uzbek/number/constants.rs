@@ -43,6 +43,27 @@ pub(super) const MULT: [(i32, &str); 7] = [
     (18, "kvintilion"),
 ];
 
+pub(super) const FLOAT_PREFIX: [&str; 18] = [
+    ("o‘ndan"),
+    ("yuzdan"),
+    ("mingdan"),
+    ("o‘n mingdan"),
+    ("yuz mingdan"),
+    ("milliondan"),
+    ("o‘n milliondan"),
+    ("yuz milliondan"),
+    ("milliarddan"),
+    ("o‘n milliarddan"),
+    ("yuz milliarddan"),
+    ("trilliondan"),
+    ("o‘n trilliondan"),
+    ("yuz trilliondan"),
+    ("kvadrilliondan"),
+    ("o‘n kvadrilliondan"),
+    ("yuz kvadrilliondan"),
+    ("kvintiliondan")
+];
+
 pub(super) const WORD_0_TO_90: [(&str, i32); 28] = [
     ("nol", 0),
     ("bir", 1),
