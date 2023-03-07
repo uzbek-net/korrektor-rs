@@ -1,6 +1,8 @@
 //! Functions to return Uzbek word equivalent of numbers.
 //!
 //! Only latin mode supported currently.
+use crate::uzbek::number::constants::{FLOAT_PREFIX, MULT};
+
 mod constants;
 
 /// Returns a word representation of a given number.
@@ -11,11 +13,20 @@ mod constants;
 /// ```rust
 ///use korrektor::uzbek::number;
 ///
-/// let output = number::integer_to_word(1024);
+/// let output = number::integer_to_word("1024");
 /// let expected = "bir ming yigirma to‘rt".to_string();
 /// assert_eq!(output, expected);
 /// ```
-pub fn integer_to_word(number: i64) -> String {
+pub fn integer_to_word(number: &str) -> String {
+    if !is_valid_integer(number) {
+        panic!("Not an integer: {number}");
+    }
+    if number.len() > 18 {
+        panic!("Invalid integer: {number}. Overflow, only numbers under 19 digits are allowed.");
+    }
+
+    let number: i64 = number.parse().unwrap();
+
     //find number to word in constants 0 to 19
     if number == 0 {
         return String::from("nol");
@@ -26,7 +37,7 @@ pub fn integer_to_word(number: i64) -> String {
     // find number to word from 0 to 100
     else if number < 100 {
         let index: usize = (number / 10 - 2) as usize;
-        return constants::TEEN[index].1.to_string() + " " + &integer_to_word(number % 10);
+        return constants::TEEN[index].1.to_string() + " " + &integer_to_word(&(number % 10).to_string());
     }
     // find number to word from 0 to 1000
     else if number < i64::pow(10, 3) {
@@ -46,9 +57,31 @@ pub fn integer_to_word(number: i64) -> String {
     }
 }
 
+pub fn float_to_word(number: &str) -> String {
+    if !is_valid_float(number) {
+        panic!("Invalid floating-point number: {number}");
+    }
+
+    let number: Vec<&str> = number.split('.').collect();
+
+    let fraction = number[1];
+    if number[1].len() > 18 {
+        panic!("Invalid fraction: {fraction}. Overflow, only numbers under 19 digits are allowed.")
+    }
+
+    let fraction_prefix = get_fraction_prefix(fraction);
+
+    let integer = integer_to_word(number[0]);
+    let fraction = integer_to_word(number[1]);
+
+    let fraction = fraction_prefix + " " + &fraction;
+
+    integer + " butun " + &fraction
+}
+
 fn base(number: i64, power: u32) -> String {
-    let base = integer_to_word(number / i64::pow(10, power));
-    let mult_tuple = constants::MULT.iter().find(|x| x.0 == power as i32);
+    let base = integer_to_word(&(number / i64::pow(10, power)).to_string());
+    let mult_tuple = MULT.iter().find(|x| x.0 == power as i32);
     let mult = match mult_tuple {
         Some(tuple) => tuple.1,
         None => panic!("Such multiplication value is not found! power is {power}")
@@ -59,7 +92,7 @@ fn base(number: i64, power: u32) -> String {
 
 fn one(number: i64, power: u32) -> String {
     let y = number % i64::pow(10, power);
-    let s = integer_to_word(y);
+    let s = integer_to_word(&y.to_string());
     let separator =
         if power == 2 && !s.is_empty() { " " } else if y < 100 {
             if y == 0 { "" } else { " " }
@@ -74,7 +107,25 @@ fn hundred(number: i64, power: u32) -> String {
         if y == 0 { "" } else { " " }
     } else { " " };
 
-    String::new() + &base(number, power) + sep + &integer_to_word(y)
+    String::new() + &base(number, power) + sep + &integer_to_word(&y.to_string())
+}
+
+fn get_fraction_prefix(number: &str) -> String {
+    let prefix = FLOAT_PREFIX[number.len() - 1];
+
+    prefix.to_string()
+}
+
+fn is_valid_integer(number: &str) -> bool {
+    let re = regex::Regex::new(r"^(\d+)$").unwrap();
+
+    re.is_match(number)
+}
+
+fn is_valid_float(number: &str) -> bool {
+    let re = regex::Regex::new(r"^(\d+\.\d+)$").unwrap();
+
+    re.is_match(number)
 }
 
 #[cfg(test)]
@@ -98,11 +149,19 @@ mod as_tests {
 
     #[test]
     fn cw_test() {
-        assert_eq!(integer_to_word(0), String::from("nol"));
-        assert_eq!(integer_to_word(9), String::from("to‘qqiz"));
-        assert_eq!(integer_to_word(32), String::from("o‘ttiz ikki"));
-        assert_eq!(integer_to_word(104), String::from("bir yuz to‘rt"));
-        assert_eq!(integer_to_word(1024), String::from("bir ming yigirma to‘rt"));
-        assert_eq!(integer_to_word(3456), String::from("uch ming to‘rt yuz ellik olti"));
+        assert_eq!(integer_to_word("0"), String::from("nol"));
+        assert_eq!(integer_to_word("9"), String::from("to‘qqiz"));
+        assert_eq!(integer_to_word("32"), String::from("o‘ttiz ikki"));
+        assert_eq!(integer_to_word("104"), String::from("bir yuz to‘rt"));
+        assert_eq!(integer_to_word("1024"), String::from("bir ming yigirma to‘rt"));
+        assert_eq!(integer_to_word("3456"), String::from("uch ming to‘rt yuz ellik olti"));
+    }
+
+    #[test]
+    fn float_test() {
+        assert_eq!(float_to_word("3.0"), String::from("uch butun o‘ndan nol"));
+        assert_eq!(float_to_word("3.75"), String::from("uch butun yuzdan yetmish besh"));
+        assert_eq!(float_to_word("3.754"), String::from("uch butun mingdan yetti yuz ellik to‘rt"));
+        assert_eq!(float_to_word("3.7548"), String::from("uch butun o‘n mingdan yetti ming besh yuz qirq sakkiz"))
     }
 }
