@@ -5,9 +5,13 @@ use crate::uzbek::number::constants::{FLOAT_PREFIX, MULT};
 
 mod constants;
 
-/// Returns a word representation of a given number.
+/// Returns a word representation of a given integer number.
 ///
-/// Given an integer returns a String with corresponding word equivalent.
+/// Given an integer string slice returns a String with corresponding word equivalent.
+///
+/// # Panics
+/// - if a string is not a valid integer (make sure you remove any other symbols and whitespace)
+/// - if it has more than 18 digits in it (i.e. "999999999999999999" is still valid)
 ///
 /// # Example
 /// ```rust
@@ -57,6 +61,22 @@ pub fn integer_to_word(number: &str) -> String {
     }
 }
 
+/// Returns a word representation of a given floating-point number.
+///
+/// Given an floating-point number string slice returns a String with corresponding word equivalent.
+///
+/// # Panics
+/// - if a string is not a valid floating-point number (exclude integers or use x.0 form, make sure you remove any other symbols and whitespace)
+/// - if it has more than 18 digits in its integer or precision part (i.e. "999999999999999999.999999999999999999" is still valid)
+///
+/// # Example
+/// ```rust
+///use korrektor::uzbek::number;
+///
+/// let output = number::float_to_word("574.789");
+/// let expected = "besh yuz yetmish to‘rt butun mingdan yetti yuz sakson to‘qqiz".to_string();
+/// assert_eq!(output, expected);
+/// ```
 pub fn float_to_word(number: &str) -> String {
     if !is_valid_float(number) {
         panic!("Invalid floating-point number: {number}");
