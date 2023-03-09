@@ -29,11 +29,10 @@ dasturlash tillariga ham hech qanday muammolarsiz integratsiya qilishingiz mumki
 
 ## O'rnatish
 
-Quyidagi konfiguratsion qismni Cargo.toml fayliga joylashtiring:
+Quyidagi keltirilgan buyruq satrini loyiha ichidan terminal ochib ishga tushuring:
 
-```toml
-[dependencies]
-korrektor = "0.1.0"
+```shell
+cargo add korrektor
 ```
 
 ## Litsenziya
