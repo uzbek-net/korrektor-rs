@@ -2,47 +2,13 @@
 //!
 //! Implemented according to grammar rules
 //! for both latin and cyrillic modes.
+mod constants;
+
 use pcre::Pcre;
 use regex::Regex;
 
-const LATIN_EXP: [(&str, &str); 7] = [
-    ("singil", "si-ngil"),
-    ("dengiz", "de-ngiz"),
-    ("pešayvon", "pe-shayvon"),
-    ("pešona", "pe-shona"),
-    ("maishat", "mai-shat"),
-    ("išingizni", "ishi-ngiz-ni"),
-    ("išingizda", "ishi-ngiz-da"),
-];
-
-const CYRILLIC_EXP: [(&str, &str); 0] = [];
-
-const A_CORRECT: [(&str, &str); 5] = [
-    ("g[ʻʼ'‘’‛′ʽ`]", "ğ"),
-    ("o[ʻʼ'‘’‛′ʽ`]", "ŏ"),
-    ("ʻ|ʼ|'|‘|’|‛|′|ʽ|`", "ʼ"),
-    ("sh", "š"),
-    ("ch", "č")
-];
-
-const I_CORRECT: [(&str, &str); 4] = [
-    ("ğ", "gʻ"),
-    ("ŏ", "o‘"),
-    ("š", "sh"),
-    ("č", "ch")
-];
-
-const REPLACE_CYR: [(&str, &str); 2] = [
-    ("[аоуэияёюеў]", "V"),
-    ("[бвгджзйклмнпрстфхцчшқғҳ]", "C")
-];
-const REPLACE_LAT: [(&str, &str); 2] = [
-    ("[aoueiŏ]", "V"),
-    ("[bdfghjklmnpqrstvxyzğšč]", "C")
-];
-
 fn split_word(word: &str) -> String {
-    let mut result = a_correct(&word.to_string());
+    let mut result = a_correct(word);
     result = result.trim().to_string();
     let mut last = result.clone();
 
@@ -54,10 +20,10 @@ fn split_word(word: &str) -> String {
 
     // if found latin word
     for _ in matches {
-        let key = LATIN_EXP.iter().find(|k| k.0 == copy);
+        let key = constants::LATIN_EXP.iter().find(|k| k.0 == copy);
         if let Some(pair) = key { return pair.1.to_string(); }
 
-        for pair in REPLACE_LAT {
+        for pair in constants::REPLACE_LAT {
             let re = Regex::new(pair.0).unwrap();
             result = re.replace_all(&result, pair.1).as_ref().to_string();
         }
@@ -69,10 +35,10 @@ fn split_word(word: &str) -> String {
 
     // if found cyrillic word
     for _ in matches {
-        let key = CYRILLIC_EXP.iter().find(|k| k.0 == copy);
+        let key = constants::CYRILLIC_EXP.iter().find(|k| k.0 == copy);
         if let Some(pair) = key { return pair.1.to_string(); }
 
-        for pair in REPLACE_CYR {
+        for pair in constants::REPLACE_CYR {
             let re = Regex::new(pair.0).unwrap();
             result = re.replace_all(&result, pair.1).as_ref().to_string();
         }
@@ -126,23 +92,23 @@ pub fn split_text(text: &str) -> String{
     result.trim().to_string()
 }
 
-fn a_correct(text: &String) -> String {
-    let mut input = text.clone();
+fn a_correct(text: &str) -> String {
+    let mut input = text.to_string();
     input = input.to_lowercase();
 
-    for (pattern, replacement) in A_CORRECT {
-        let re = regex::Regex::new(pattern).unwrap();
+    for (pattern, replacement) in constants::A_CORRECT {
+        let re = Regex::new(pattern).unwrap();
         input = re.replace_all(&input, replacement).as_ref().to_string();
     }
 
     input
 }
 
-fn i_correct(text: &String) -> String {
-    let mut input = text.clone();
+fn i_correct(text: &str) -> String {
+    let mut input = text.to_string();
 
-    for (pattern, replacement) in I_CORRECT {
-        let re = regex::Regex::new(pattern).unwrap();
+    for (pattern, replacement) in constants::I_CORRECT {
+        let re = Regex::new(pattern).unwrap();
         input = re.replace_all(&input, replacement).as_ref().to_string();
     }
 
