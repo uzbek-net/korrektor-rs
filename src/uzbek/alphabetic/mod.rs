@@ -3,39 +3,7 @@
 //! Both cyrillic and latin modes can be used.
 use regex::Regex;
 
-const CHAR_ORDER: [&str; 128] = [
-    "ê", "a", "b", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "x", "y", "z", "ŏ", "ğ", "š", "č",
-    "Ê", "A", "B", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "X", "Y", "Z", "Ŏ", "Ğ", "Š", "Č",
-    "а", "б", "д", "г", "д", "е", "ё", "ж", "з", "и", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у", "ф", "х", "ц", "ч", "ш", "ъ", "ь", "э", "я", "ю", "ў", "қ", "ғ", "ҳ",
-    "А", "Б", "Д", "Г", "Д", "Е", "Ё", "Ж", "З", "И", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Ъ", "Ь", "Э", "Ю", "Я", "Ў", "Қ", "Ғ", "Ҳ"
-];
-
-const TO_SORT: [&str; 11] = [
-    ("G[ʻʼ'‘’‛′ʽ`] Ğ"),
-    ("g[ʻʼ'‘’‛′ʽ`] ğ"),
-    ("O[ʻʼ'‘’‛′ʽ`] Ŏ"),
-    ("o[ʻʼ'‘’‛′ʽ`] ŏ"),
-    ("ʻ|ʼ|'|‘|’|‛|′|ʽ|` ʼ"),
-    ("Sh Š"),
-    ("SH Ö"),
-    ("sh š"),
-    ("Ch Č"),
-    ("CH Ü"),
-    ("ch č")
-];
-
-const FROM_SORT: [&str; 10] = [
-    ("Ğ G‘"),
-    ("ğ g‘"),
-    ("Ŏ O‘"),
-    ("ŏ o‘"),
-    ("Š Sh"),
-    ("Ö SH"),
-    ("š sh"),
-    ("Č Ch"),
-    ("Ü CH"),
-    ("č ch")
-];
+mod constants;
 
 /// Sorts words in alphabetically ascending order.
 ///
@@ -59,7 +27,7 @@ pub fn sort(text: &str) -> String {
 fn to_sortable(text: String) -> String {
     let mut input: String = text;
 
-    for pair in TO_SORT.into_iter() {
+    for pair in constants::TO_SORT.into_iter() {
         let pattern = pair.split_whitespace().next().unwrap();
         let replacer = pair.split_whitespace().last().unwrap();
 
@@ -73,7 +41,7 @@ fn to_sortable(text: String) -> String {
 fn from_sortable(text: String) -> String {
     let mut input: String = text;
 
-    for pair in FROM_SORT.into_iter() {
+    for pair in constants::FROM_SORT.into_iter() {
         let pattern = pair.split_whitespace().next().unwrap();
         let replacer = pair.split_whitespace().last().unwrap();
 
@@ -103,7 +71,7 @@ fn usort(string1: &str, string2: &str) -> i8 {
         if is_exceptioned(char1) {
             value1 = get_exceptioned_value(char1);
         } else {
-            value1 = match CHAR_ORDER.iter().position(|&r| r == char1.to_string()) {
+            value1 = match constants::CHAR_ORDER.iter().position(|&r| r == char1.to_string()) {
                 Some(num) => num,
                 None => panic!("Error in usort: char {char1} is not found and can not be sorted")
             }
@@ -112,7 +80,7 @@ fn usort(string1: &str, string2: &str) -> i8 {
         if is_exceptioned(char2) {
             value2 = get_exceptioned_value(char2);
         } else {
-            value2 = match CHAR_ORDER.iter().position(|&r| r == char2.to_string()) {
+            value2 = match constants::CHAR_ORDER.iter().position(|&r| r == char2.to_string()) {
                 Some(num) => num,
                 None => panic!("Error in usort: char {char2} is not found can not be sorted")
             }
