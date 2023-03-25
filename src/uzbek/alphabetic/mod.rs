@@ -214,4 +214,11 @@ mod as_tests {
         let output = String::from("estafeta o‘zbek chilonzor chiroyli G‘ozal");
         assert_eq!(sort(input), output)
     }
+
+    #[test]
+    fn get_sorted_text_cyr_test() {
+        let input = "Ғозал эстафета чилонзор ўзбек чиройли";
+        let output = String::from("чилонзор чиройли эстафета ўзбек Ғозал");
+        assert_eq!(sort(input), output)
+    }
 }
