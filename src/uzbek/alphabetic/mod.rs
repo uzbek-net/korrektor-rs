@@ -1,7 +1,7 @@
 //! Functions to sort Uzbek words.
 //!
 //! Both cyrillic and latin modes can be used.
-use regex::Regex;
+use regex;
 
 mod constants;
 
@@ -18,22 +18,19 @@ mod constants;
 /// assert_eq!(output, expected);
 ///```
 pub fn sort(text: &str) -> String {
+    // replace complex symbols in text with sortable alternatives
     let sortable = &to_sortable(text.to_string());
+
     let sorted_intermediate = sort_sortable(sortable);
 
+    // replace sortable alternatives with original values after sorting
     from_sortable(sorted_intermediate)
 }
 
 fn to_sortable(text: String) -> String {
     let mut input: String = text;
 
-    for pair in constants::TO_SORT.into_iter() {
-        let pattern = pair.split_whitespace().next().unwrap();
-        let replacer = pair.split_whitespace().last().unwrap();
-
-        let re = Regex::new(pattern).unwrap();
-        input = re.replace_all(&input, replacer).as_ref().to_string();
-    };
+    input = replace_pairs(&input, Box::new(constants::TO_SORT));
 
     input
 }
@@ -41,13 +38,7 @@ fn to_sortable(text: String) -> String {
 fn from_sortable(text: String) -> String {
     let mut input: String = text;
 
-    for pair in constants::FROM_SORT.into_iter() {
-        let pattern = pair.split_whitespace().next().unwrap();
-        let replacer = pair.split_whitespace().last().unwrap();
-
-        let re = Regex::new(pattern).unwrap();
-        input = re.replace_all(&input, replacer).as_ref().to_string();
-    };
+    input = replace_pairs(&input, Box::new(constants::FROM_SORT));
 
     input
 }
@@ -65,26 +56,9 @@ fn usort(string1: &str, string2: &str) -> i8 {
             None => panic!("Error in usort: no char at the index {i} in &str: {string2}")
         };
 
-        let mut value1 = 0;
-        let mut value2 = 0;
-
-        if is_exceptioned(char1) {
-            value1 = get_exceptioned_value(char1);
-        } else {
-            value1 = match constants::CHAR_ORDER.iter().position(|&r| r == char1.to_string()) {
-                Some(num) => num,
-                None => panic!("Error in usort: char {char1} is not found and can not be sorted")
-            }
-        }
-
-        if is_exceptioned(char2) {
-            value2 = get_exceptioned_value(char2);
-        } else {
-            value2 = match constants::CHAR_ORDER.iter().position(|&r| r == char2.to_string()) {
-                Some(num) => num,
-                None => panic!("Error in usort: char {char2} is not found can not be sorted")
-            }
-        }
+        // get position of characters in the alphabet
+        let value1 = get_value(char1);
+        let value2 = get_value(char2);
 
         match value1.cmp(&value2) {
             std::cmp::Ordering::Less => return -1,
@@ -139,6 +113,28 @@ fn get_exceptioned_value(value: char) -> usize {
     if value == 'Ü' { return 56; }
 
     0
+}
+
+fn get_value(value: char) -> usize {
+    if is_exceptioned(value) {
+        get_exceptioned_value(value)
+    } else {
+        return match constants::CHAR_ORDER.iter().position(|&r| r == value.to_string()) {
+            Some(num) => num,
+            None => panic!("Error in usort: char {value} is not found and can not be sorted")
+        };
+    }
+}
+
+fn replace_pairs(input: &str, constant: Box<[(&str, &str)]>) -> String {
+    let mut input = input.to_string();
+
+    for (pattern, replacement) in constant.as_ref() {
+        let re = regex::Regex::new(pattern).unwrap();
+        input = re.replace_all(&input, *replacement).as_ref().to_string();
+    }
+
+    input
 }
 
 #[cfg(test)]
