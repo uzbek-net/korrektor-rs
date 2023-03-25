@@ -28,7 +28,7 @@ pub fn count(text: &str) -> HashMap<String, usize> {
     let mut pre_result: HashMap<&str, usize> = HashMap::new();
 
     let mut re = Pcre::compile(r"[\p{Cyrillic}|\p{Latin}|0-9|\-_]+").unwrap();
-    let matches = re.matches(&text);
+    let matches = re.matches(text);
 
     if matches.count() > 0 {
         let input_vec = text.split_whitespace();
