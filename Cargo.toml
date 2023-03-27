@@ -1,4 +1,5 @@
 [workspace]
 members = [
-    "korrektor"
+    "korrektor",
+    "korrektor-utils"
 ]
