@@ -1,5 +1,10 @@
+/// Crate that holds utility functions needed
+/// for korrektor.
 use pcre::MatchIterator;
 
+/// Replaces constants represented as a tuple array. Each first
+/// element of the tuple replaces each second element
+/// with the help of the regex crate.
 fn replace_pairs(input: &str, constant: Box<[(&str, &str)]>) -> String {
     let mut input = input.to_string();
 
@@ -11,6 +16,9 @@ fn replace_pairs(input: &str, constant: Box<[(&str, &str)]>) -> String {
     input
 }
 
+/// Wraps all regex matches of pcre crate
+/// in 〈〉 brackets in order to preserve some
+/// text from some operations in korrektor.
 fn wrap_matches(text: &str, matches: MatchIterator) -> String{
     let mut result = text.to_string();
 
