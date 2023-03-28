@@ -35,11 +35,11 @@ pub(super) fn wrap_ips(input: &str) -> String {
 }
 
 #[cfg(test)]
-mod as_tests  {
-use super::*;
+mod as_tests {
+    use super::*;
 
     #[test]
-    fn wrap_url_test() {
+    fn wrap_ips_test() {
         let input = "12 124.34.5.234 12.3 2001:db8:3c4d:0015:0000:0000:1a2f:1a2b hello 2001:db8:3c4d:15::";
         let expected = "12 〈124.34.5.234〉 12.3 〈2001:db8:3c4d:0015:0000:0000:1a2f:1a2b〉 hello 〈2001:db8:3c4d:15::〉";
 
