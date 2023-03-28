@@ -1,7 +1,7 @@
 //! Functions to sort Uzbek words.
 //!
 //! Both cyrillic and latin modes can be used.
-use regex;
+use korrektor_utils;
 
 mod constants;
 
@@ -30,7 +30,7 @@ pub fn sort(text: &str) -> String {
 fn to_sortable(text: String) -> String {
     let mut input: String = text;
 
-    input = replace_pairs(&input, Box::new(constants::TO_SORT));
+    input = korrektor_utils::replace_pairs(&input, Box::new(constants::TO_SORT));
 
     input
 }
@@ -38,7 +38,7 @@ fn to_sortable(text: String) -> String {
 fn from_sortable(text: String) -> String {
     let mut input: String = text;
 
-    input = replace_pairs(&input, Box::new(constants::FROM_SORT));
+    input = korrektor_utils::replace_pairs(&input, Box::new(constants::FROM_SORT));
 
     input
 }
@@ -124,17 +124,6 @@ fn get_value(value: char) -> usize {
             None => panic!("Error in usort: char {value} is not found and can not be sorted")
         };
     }
-}
-
-fn replace_pairs(input: &str, constant: Box<[(&str, &str)]>) -> String {
-    let mut input = input.to_string();
-
-    for (pattern, replacement) in constant.as_ref() {
-        let re = regex::Regex::new(pattern).unwrap();
-        input = re.replace_all(&input, *replacement).as_ref().to_string();
-    }
-
-    input
 }
 
 #[cfg(test)]
