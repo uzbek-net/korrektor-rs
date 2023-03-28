@@ -11,12 +11,10 @@ authors = [
     "UwUssimo Robinson <uwussimo@icloud.com> (https://uwussi.moe)"
 ]
 keywords = ["uzbek", "language", "korrektor", "text-processing"]
-readme = "readme.md"
+readme = "../readme.md"
 categories = ["text-processing"]
 license = "MIT OR Apache-2.0"
 exclude = ["target", ".github"]
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 regex = "1.7.0"
