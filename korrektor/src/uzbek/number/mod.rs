@@ -4,6 +4,7 @@
 use crate::uzbek::number::constants::{FLOAT_PREFIX, MULT};
 
 mod constants;
+mod helper;
 
 /// Returns a word representation of a given integer number.
 ///
@@ -22,7 +23,7 @@ mod constants;
 /// assert_eq!(output, expected);
 /// ```
 pub fn integer_to_word(number: &str) -> String {
-    if !is_valid_integer(number) {
+    if !helper::is_valid_integer(number) {
         panic!("Not an integer: {number}");
     }
     if number.len() > 18 {
@@ -78,7 +79,7 @@ pub fn integer_to_word(number: &str) -> String {
 /// assert_eq!(output, expected);
 /// ```
 pub fn float_to_word(number: &str) -> String {
-    if !is_valid_float(number) {
+    if !helper::is_valid_float(number) {
         panic!("Invalid floating-point number: {number}");
     }
 
@@ -136,17 +137,6 @@ fn get_fraction_prefix(number: &str) -> String {
     prefix.to_string()
 }
 
-fn is_valid_integer(number: &str) -> bool {
-    let re = regex::Regex::new(r"^(\d+)$").unwrap();
-
-    re.is_match(number)
-}
-
-fn is_valid_float(number: &str) -> bool {
-    let re = regex::Regex::new(r"^(\d+\.\d+)$").unwrap();
-
-    re.is_match(number)
-}
 
 #[cfg(test)]
 mod as_tests {
