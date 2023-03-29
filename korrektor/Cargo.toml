@@ -18,6 +18,7 @@ exclude = ["target", ".github"]
 
 [dependencies]
 regex = "1.7.0"
+fancy-regex = "0.11.0"
 pcre = "0.2.3"
 itertools = "0.10.5"
 korrektor-utils = "0.1.1"
