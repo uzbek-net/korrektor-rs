@@ -34,6 +34,13 @@ pub(super) fn wrap_ips(input: &str) -> String {
     korrektor_utils::wrap_matches(&result, matches_ipv6)
 }
 
+pub(super) fn wrap_phones(input : &str) -> String {
+    let mut re = pcre::Pcre::compile("(998)?(90|91|93|94|95|97|98|99|50|88|69|70|71|72|77|33)([0-9]{3})([0-9]{2})([0-9]{2})").unwrap();
+    let matches = re.matches(input);
+
+    korrektor_utils::wrap_matches(input, matches)
+}
+
 #[cfg(test)]
 mod as_tests {
     use super::*;
@@ -44,5 +51,13 @@ mod as_tests {
         let expected = "12 〈124.34.5.234〉 12.3 〈2001:db8:3c4d:0015:0000:0000:1a2f:1a2b〉 hello 〈2001:db8:3c4d:15::〉";
 
         assert_eq!(wrap_ips(input), expected.to_string());
+    }
+
+    #[test]
+    fn wrap_phones_test() {
+        let input = "salom +998936523602 325 12.3 daraxt 712345689 71234 336519087";
+        let expected = "salom +〈998936523602〉 325 12.3 daraxt 〈712345689〉 71234 〈336519087〉";
+
+        assert_eq!(wrap_phones(input), expected.to_string());
     }
 }
