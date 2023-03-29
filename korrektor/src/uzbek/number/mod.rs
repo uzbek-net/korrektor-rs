@@ -2,6 +2,8 @@
 //!
 //! Only latin mode supported currently.
 use crate::uzbek::number::constants::{FLOAT_PREFIX, MULT};
+use crate::uzbek::number::helper::{convert_floats, convert_integers, wrap_ips, wrap_phones};
+use fancy_regex;
 
 mod constants;
 mod helper;
@@ -100,6 +102,26 @@ pub fn float_to_word(number: &str) -> String {
     integer + " butun " + &fraction
 }
 
+pub fn all_numbers_to_word(text: &str) -> String {
+    let mut input = wrap_ips(text);
+    input = wrap_phones(&input);
+
+    // each capture is a part of text outside special brackets (may have multiple words and/or numbers)
+    let re = fancy_regex::Regex::new("([^〈〉](?![^〈]*〉))+").unwrap();
+    for capture in re.captures_iter(&input.clone()) {
+        let initial_cap = capture.unwrap()[0].to_string();
+        let mut capture = initial_cap.clone();
+
+        capture = capture.replace(&capture, &convert_floats(&capture));
+        input = input.replacen(&initial_cap, &convert_integers(&capture), 1);
+    }
+
+    let re = regex::Regex::new("[〈〉]").unwrap();
+    input = re.replace_all(&input, "").to_string();
+
+    input
+}
+
 fn base(number: i64, power: u32) -> String {
     let base = integer_to_word(&(number / i64::pow(10, power)).to_string());
     let mult_tuple = MULT.iter().find(|x| x.0 == power as i32);
@@ -173,5 +195,13 @@ mod as_tests {
         assert_eq!(float_to_word("3.75"), String::from("uch butun yuzdan yetmish besh"));
         assert_eq!(float_to_word("3.754"), String::from("uch butun mingdan yetti yuz ellik to‘rt"));
         assert_eq!(float_to_word("3.7548"), String::from("uch butun o‘n mingdan yetti ming besh yuz qirq sakkiz"))
+    }
+
+    #[test]
+    fn all_numbers_test() {
+        let input = "12 998336523409 12.5 1024 124.34.5.234 2001:db8:3c4d:0015:0000:0000:1a2f:1a2b";
+        let expected = "o‘n ikki 998336523409 o‘n ikki butun o‘ndan besh bir ming yigirma to‘rt 124.34.5.234 2001:db8:3c4d:0015:0000:0000:1a2f:1a2b";
+
+        assert_eq!(all_numbers_to_word(input), expected.to_string());
     }
 }
