@@ -112,11 +112,11 @@ pub fn float_to_word(number: &str) -> String {
 /// ```rust
 /// use korrektor::uzbek::number;
 ///
-/// let output = number::all_numbers_to_word("12, salom 998336523409 12.5 daraxt 1024 124.34.5.234");
+/// let output = number::numbers_to_word("12, salom 998336523409 12.5 daraxt 1024 124.34.5.234");
 /// let expected = "o‘n ikki, salom 998336523409 o‘n ikki butun o‘ndan besh daraxt bir ming yigirma to‘rt 124.34.5.234".to_string();
 /// assert_eq!(output, expected);
 /// ```
-pub fn all_numbers_to_word(text: &str) -> String {
+pub fn numbers_to_word(text: &str) -> String {
     let mut input = wrap_ips(text);
     input = wrap_phones(&input);
 
@@ -216,6 +216,6 @@ mod as_tests {
         let input = "12, 998336523409 12.5 1024 124.34.5.234 2001:db8:3c4d:0015:0000:0000:1a2f:1a2b 12.5 1024";
         let expected = "o‘n ikki, 998336523409 o‘n ikki butun o‘ndan besh bir ming yigirma to‘rt 124.34.5.234 2001:db8:3c4d:0015:0000:0000:1a2f:1a2b o‘n ikki butun o‘ndan besh bir ming yigirma to‘rt";
 
-        assert_eq!(all_numbers_to_word(input), expected.to_string());
+        assert_eq!(numbers_to_word(input), expected.to_string());
     }
 }
