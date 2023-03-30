@@ -16,6 +16,18 @@ pub fn replace_pairs(input: &str, constant: Box<[(&str, &str)]>) -> String {
     input
 }
 
+/// Wrap all matches in the given text with
+/// provided pattern that must be a valid regex.
+///
+/// # Panics
+/// Supplied an invalid regex that can not be compiled by pcre crate
+pub fn wrap_regex(text: &str, pattern: &str) -> String {
+    let mut re = pcre::Pcre::compile(pattern).unwrap();
+    let matches = re.matches(text);
+
+    wrap_matches(text, matches)
+}
+
 /// Wraps all regex matches of pcre crate
 /// in 〈〉 brackets in order to preserve some
 /// text from some operations in korrektor.
@@ -30,3 +42,37 @@ pub fn wrap_matches(text: &str, matches: MatchIterator) -> String{
 
     result
 }
+
+pub fn unwrap_text(text: &str) -> String {
+    let re = regex::Regex::new("[〈〉]").unwrap();
+
+    re.replace_all(text, "").to_string()
+}
+
+/*#[cfg(test)]
+mod as_tests {
+    use super::*;
+
+    #[test]
+    fn unwrap_text_test() {
+        let input = "@ki-d @ki- 〈@hello〉 〈〈nyan@mail.uz〉〉 〈〈nya@mail.uz〉〉 〈https://nyan.com〉 go'zal 〈@crystalny〉";
+        let expected = "@ki-d @ki- @hello nyan@mail.uz nya@mail.uz https://nyan.com go'zal @crystalny";
+
+        assert_eq!(unwrap_text(input), expected.to_string());
+    }
+
+    #[test]
+    fn wrap_regex_test() {
+        let input = "@ki-d @ki- @hello nyan@mail.uz nya@mail.uz https://nyan.com go'zal @crystalny";
+        let pattern = r"([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)|@(?!.*\-|.*\-$)[a-zA-Z0-9][\w-]+[a-zA-Z0-9]{0,39}";
+        let expected = "@ki-d @ki- 〈@hello〉 〈〈nyan@mail.uz〉〉 〈〈nya@mail.uz〉〉 https://nyan.com go'zal 〈@crystalny〉";
+
+        assert_eq!(wrap_regex(input, pattern), expected.to_string());
+
+        let input = "@ki-d https://nyan.com go'zal @crystalny";
+        let pattern = "(?i)\\b(?:(?:https?|ftp|file|ssh):\\/\\/|www\\.|ftp\\.)[-A-Z0-9+&@#\\/%=~_|$?!:,.]*[A-Z0-9+&@#\\/%=~_|$]";
+        let expected = "@ki-d 〈https://nyan.com〉 go'zal @crystalny";
+
+        assert_eq!(wrap_regex(input, pattern), expected.to_string());
+    }
+}*/
