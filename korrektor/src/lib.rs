@@ -16,5 +16,6 @@
 //!
 //! # Upcoming
 //! Public API with transliteration and correction functionality.
-pub mod uzbek;
+pub mod error;
 pub mod utils;
+pub mod uzbek;
