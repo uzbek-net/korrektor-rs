@@ -43,6 +43,8 @@ pub fn wrap_matches(text: &str, matches: MatchIterator) -> String{
     result
 }
 
+/// Removes all brackets that wrap special text
+/// protected from korrektor operations.
 pub fn unwrap_text(text: &str) -> String {
     let re = regex::Regex::new("[〈〉]").unwrap();
 
