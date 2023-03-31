@@ -1,6 +1,7 @@
 //! Functions to sort Uzbek words.
 //!
 //! Both cyrillic and latin modes can be used.
+use crate::error::KorrektorError;
 use korrektor_utils;
 
 mod constants;
@@ -15,16 +16,16 @@ mod constants;
 ///
 /// let output = alphabetic::sort("G‘ozal estafeta chilonzor o'zbek chiroyli");
 /// let expected = "estafeta o‘zbek chilonzor chiroyli G‘ozal".to_string();
-/// assert_eq!(output, expected);
+/// assert_eq!(output.unwrap(), expected);
 ///```
-pub fn sort(text: &str) -> String {
+pub fn sort(text: &str) -> Result<String, KorrektorError> {
     // replace complex symbols in text with sortable alternatives
     let sortable = &to_sortable(text.to_string());
 
-    let sorted_intermediate = sort_sortable(sortable);
+    let sorted_intermediate = sort_sortable(sortable)?;
 
     // replace sortable alternatives with original values after sorting
-    from_sortable(sorted_intermediate)
+    Ok(from_sortable(sorted_intermediate))
 }
 
 fn to_sortable(text: String) -> String {
@@ -43,7 +44,7 @@ fn from_sortable(text: String) -> String {
     input
 }
 
-fn usort(string1: &str, string2: &str) -> i8 {
+fn usort(string1: &str, string2: &str) -> Result<i8, KorrektorError> {
     let length = std::cmp::min(string1.len() - 1, string2.len() - 1);
 
     for i in 0..length {
@@ -57,24 +58,24 @@ fn usort(string1: &str, string2: &str) -> i8 {
         };
 
         // get position of characters in the alphabet
-        let value1 = get_value(char1);
-        let value2 = get_value(char2);
+        let value1 = get_value(char1)?;
+        let value2 = get_value(char2)?;
 
         match value1.cmp(&value2) {
-            std::cmp::Ordering::Less => return -1,
-            std::cmp::Ordering::Greater => return 1,
+            std::cmp::Ordering::Less => return Ok(-1),
+            std::cmp::Ordering::Greater => return Ok(1),
             std::cmp::Ordering::Equal => continue,
         };
     }
 
     match (string1.len()).cmp(&string2.len()) {
-        std::cmp::Ordering::Less => -1,
-        std::cmp::Ordering::Greater => 1,
-        std::cmp::Ordering::Equal => 0,
+        std::cmp::Ordering::Less => Ok(-1),
+        std::cmp::Ordering::Greater => Ok(1),
+        std::cmp::Ordering::Equal => Ok(0),
     }
 }
 
-fn sort_sortable(text: &str) -> String {
+fn sort_sortable(text: &str) -> Result<String, KorrektorError> {
     let mut sortable: Vec<&str> = text.split_whitespace().collect();
     let mut len = sortable.len();
 
@@ -82,7 +83,7 @@ fn sort_sortable(text: &str) -> String {
     while !sorted {
         sorted = true;
         for i in 0..len - 1 {
-            match usort(sortable[i], sortable[i + 1]) {
+            match usort(sortable[i], sortable[i + 1])? {
                 1 => {
                     sortable.swap(i, i + 1);
                     sorted = false;
@@ -99,7 +100,7 @@ fn sort_sortable(text: &str) -> String {
         result.push(' ');
     }
 
-    result.trim().to_string()
+    Ok(result.trim().to_string())
 }
 
 fn is_exceptioned(value: char) -> bool {
@@ -115,13 +116,14 @@ fn get_exceptioned_value(value: char) -> usize {
     0
 }
 
-fn get_value(value: char) -> usize {
+fn get_value(value: char) -> Result<usize, KorrektorError> {
     if is_exceptioned(value) {
-        get_exceptioned_value(value)
+        Ok(get_exceptioned_value(value))
     } else {
         return match constants::CHAR_ORDER.iter().position(|&r| r == value.to_string()) {
-            Some(num) => num,
-            None => panic!("Error in usort: char {value} is not found and can not be sorted")
+            Some(num) => Ok(num),
+            None => Err(KorrektorError::InvalidChar(value))
+            // panic!("Error in usort: char {value} is not found and can not be sorted")
         };
     }
 }
@@ -156,22 +158,22 @@ mod as_tests {
 
     #[test]
     fn usort_test() {
-        assert_eq!(usort("čiroyli", "čilonzor"), 1);
-        assert_eq!(usort("čiroyli", "čiroyli"), 0);
-        assert_eq!(usort("čilonzor", "čiroyli"), -1);
+        assert_eq!(usort("čiroyli", "čilonzor").unwrap(), 1);
+        assert_eq!(usort("čiroyli", "čiroyli").unwrap(), 0);
+        assert_eq!(usort("čilonzor", "čiroyli").unwrap(), -1);
     }
 
     #[test]
     fn get_sorted_text_test() {
         let input = "G‘ozal estafeta chilonzor o'zbek chiroyli";
         let output = String::from("estafeta o‘zbek chilonzor chiroyli G‘ozal");
-        assert_eq!(sort(input), output)
+        assert_eq!(sort(input).unwrap(), output)
     }
 
     #[test]
     fn get_sorted_text_cyr_test() {
         let input = "Ғозал эстафета чилонзор ўзбек чиройли";
         let output = String::from("чилонзор чиройли эстафета ўзбек Ғозал");
-        assert_eq!(sort(input), output)
+        assert_eq!(sort(input).unwrap(), output)
     }
 }
