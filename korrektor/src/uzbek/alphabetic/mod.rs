@@ -30,7 +30,7 @@ pub fn sort(text: &str) -> String {
 fn to_sortable(text: String) -> String {
     let mut input: String = text;
 
-    input = korrektor_utils::replace_pairs(&input, Box::new(constants::TO_SORT));
+    input = korrektor_utils::replace_pairs(&input, constants::TO_SORT);
 
     input
 }
@@ -38,7 +38,7 @@ fn to_sortable(text: String) -> String {
 fn from_sortable(text: String) -> String {
     let mut input: String = text;
 
-    input = korrektor_utils::replace_pairs(&input, Box::new(constants::FROM_SORT));
+    input = korrektor_utils::replace_pairs(&input, constants::FROM_SORT);
 
     input
 }

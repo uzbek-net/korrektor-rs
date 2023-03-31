@@ -1,6 +1,6 @@
 #![allow(unused)]
 
-pub(super) const NUM_1_TO_19: [(i32, &str); 19] = [
+pub(super) const NUM_1_TO_19: &[(i32, &str)] = &[
     (1, "bir"),
     (2, "ikki"),
     (3, "uch"),
@@ -22,7 +22,7 @@ pub(super) const NUM_1_TO_19: [(i32, &str); 19] = [
     (19, "o‘n to‘qqiz")
 ];
 
-pub(super) const TEEN: [(i32, &str); 8] = [
+pub(super) const TEEN: &[(i32, &str)] = &[
     (20, "yigirma"),
     (30, "o‘ttiz"),
     (40, "qirq"),
@@ -33,7 +33,7 @@ pub(super) const TEEN: [(i32, &str); 8] = [
     (90, "to‘qson")
 ];
 
-pub(super) const MULT: [(i32, &str); 7] = [
+pub(super) const MULT: &[(i32, &str)] = &[
     (2, "yuz"),
     (3, "ming"),
     (6, "million"),
@@ -43,7 +43,7 @@ pub(super) const MULT: [(i32, &str); 7] = [
     (18, "kvintilion"),
 ];
 
-pub(super) const FLOAT_PREFIX: [&str; 18] = [
+pub(super) const FLOAT_PREFIX: &[&str] = &[
     ("o‘ndan"),
     ("yuzdan"),
     ("mingdan"),
@@ -64,7 +64,7 @@ pub(super) const FLOAT_PREFIX: [&str; 18] = [
     ("kvintiliondan")
 ];
 
-pub(super) const WORD_0_TO_90: [(&str, i32); 28] = [
+pub(super) const WORD_0_TO_90: &[(&str, i32)] = &[
     ("nol", 0),
     ("bir", 1),
     ("ikki", 2),

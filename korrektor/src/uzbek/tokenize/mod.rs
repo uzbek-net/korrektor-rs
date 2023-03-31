@@ -92,26 +92,11 @@ fn split_word(word: &str) -> String {
 }
 
 fn a_correct(text: &str) -> String {
-    let mut input = text.to_string();
-    input = input.to_lowercase();
-
-    for (pattern, replacement) in constants::A_CORRECT {
-        let re = Regex::new(pattern).unwrap();
-        input = re.replace_all(&input, replacement).as_ref().to_string();
-    }
-
-    input
+    korrektor_utils::replace_pairs(&text.to_lowercase(),constants::A_CORRECT)
 }
 
 fn i_correct(text: &str) -> String {
-    let mut input = text.to_string();
-
-    for (pattern, replacement) in constants::I_CORRECT {
-        let re = Regex::new(pattern).unwrap();
-        input = re.replace_all(&input, replacement).as_ref().to_string();
-    }
-
-    input
+    korrektor_utils::replace_pairs(text,constants::I_CORRECT)
 }
 
 enum Split {
