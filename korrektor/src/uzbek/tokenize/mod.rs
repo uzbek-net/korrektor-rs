@@ -7,6 +7,32 @@ mod constants;
 use pcre::Pcre;
 use regex::Regex;
 
+/// Splits all the words in text by syllables.
+///
+/// Given a String reference returns a new String
+/// containing the words separated by syllables with a delimiter.
+/// Words in the input should be separated with a whitespace.
+/// Single word may be not padded with a whitespace.
+///
+/// # Example
+/// ```rust
+/// use korrektor::uzbek::tokenize;
+///
+/// let output = tokenize::split_text("singil chiroyli чиройли");
+/// let expected = "si-ngil chi-roy-li чи-рой-ли".to_string();
+/// assert_eq!(output, expected);
+/// ```
+pub fn split_text(text: &str) -> String {
+    let mut result = String::new();
+
+    let words = text.split_whitespace();
+    for word in words {
+        result = result + &split_word(word) + " ";
+    }
+
+    result.trim().to_string()
+}
+
 fn split_word(word: &str) -> String {
     let mut result = a_correct(word);
     result = result.trim().to_string();
@@ -65,33 +91,6 @@ fn split_word(word: &str) -> String {
     i_correct(&result)
 }
 
-///
-/// Splits all the words in text by syllables.
-///
-/// Given a String reference returns a new String
-/// containing the words separated by syllables with a delimiter.
-/// Words in the input should be separated with a whitespace.
-/// Single word may be not padded with a whitespace.
-///
-/// # Example
-/// ```rust
-/// use korrektor::uzbek::tokenize;
-///
-/// let output = tokenize::split_text("singil chiroyli чиройли");
-/// let expected = "si-ngil chi-roy-li чи-рой-ли".to_string();
-/// assert_eq!(output, expected);
-/// ```
-pub fn split_text(text: &str) -> String{
-    let mut result = String::new();
-
-    let words = text.split_whitespace();
-    for word in words {
-        result = result + &split_word(word) + " ";
-    }
-
-    result.trim().to_string()
-}
-
 fn a_correct(text: &str) -> String {
     let mut input = text.to_string();
     input = input.to_lowercase();
@@ -113,6 +112,15 @@ fn i_correct(text: &str) -> String {
     }
 
     input
+}
+
+enum Split {
+    One,
+    Two,
+    Three,
+    Four,
+    Five,
+    No,
 }
 
 fn create_map(word: &String) -> Vec<i32> {
@@ -152,15 +160,6 @@ fn create_map(word: &String) -> Vec<i32> {
     }
 
     text_map
-}
-
-enum Split {
-    One,
-    Two,
-    Three,
-    Four,
-    Five,
-    No,
 }
 
 fn get_split(vector: &Vec<char>) -> Split {
