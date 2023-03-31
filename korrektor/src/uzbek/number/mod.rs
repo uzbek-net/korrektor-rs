@@ -1,8 +1,6 @@
 //! Functions to return Uzbek word equivalent of numbers.
 //!
 //! Only latin mode supported currently.
-use crate::uzbek::number::constants::{FLOAT_PREFIX, MULT};
-use crate::uzbek::number::helper::{convert_floats, convert_integers, wrap_ips, wrap_phones};
 use fancy_regex;
 
 mod constants;
@@ -117,8 +115,8 @@ pub fn float_to_word(number: &str) -> String {
 /// assert_eq!(output, expected);
 /// ```
 pub fn numbers_to_word(text: &str) -> String {
-    let mut input = wrap_ips(text);
-    input = wrap_phones(&input);
+    let mut input = helper::wrap_ips(text);
+    input = helper::wrap_phones(&input);
 
     // each capture is a part of text outside special brackets (may have multiple words and/or numbers)
     let re = fancy_regex::Regex::new("([^〈〉](?![^〈]*〉))+").unwrap();
@@ -126,8 +124,8 @@ pub fn numbers_to_word(text: &str) -> String {
         let initial_cap = capture.unwrap()[0].to_string();
         let mut capture = initial_cap.clone();
 
-        capture = capture.replace(&capture, &convert_floats(&capture));
-        input = input.replacen(&initial_cap, &convert_integers(&capture), 1);
+        capture = capture.replace(&capture, &helper::convert_floats(&capture));
+        input = input.replacen(&initial_cap, &helper::convert_integers(&capture), 1);
     }
 
     let re = regex::Regex::new("[〈〉]").unwrap();
@@ -138,7 +136,7 @@ pub fn numbers_to_word(text: &str) -> String {
 
 fn base(number: i64, power: u32) -> String {
     let base = integer_to_word(&(number / i64::pow(10, power)).to_string());
-    let mult_tuple = MULT.iter().find(|x| x.0 == power as i32);
+    let mult_tuple = constants::MULT.iter().find(|x| x.0 == power as i32);
     let mult = match mult_tuple {
         Some(tuple) => tuple.1,
         None => panic!("Such multiplication value is not found! power is {power}")
@@ -168,7 +166,7 @@ fn hundred(number: i64, power: u32) -> String {
 }
 
 fn get_fraction_prefix(number: &str) -> String {
-    let prefix = FLOAT_PREFIX[number.len() - 1];
+    let prefix = constants::FLOAT_PREFIX[number.len() - 1];
 
     prefix.to_string()
 }
