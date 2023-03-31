@@ -49,7 +49,7 @@ pub fn unwrap_text(text: &str) -> String {
     re.replace_all(text, "").to_string()
 }
 
-/*#[cfg(test)]
+#[cfg(test)]
 mod as_tests {
     use super::*;
 
@@ -65,7 +65,7 @@ mod as_tests {
     fn wrap_regex_test() {
         let input = "@ki-d @ki- @hello nyan@mail.uz nya@mail.uz https://nyan.com go'zal @crystalny";
         let pattern = r"([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)|@(?!.*\-|.*\-$)[a-zA-Z0-9][\w-]+[a-zA-Z0-9]{0,39}";
-        let expected = "@ki-d @ki- 〈@hello〉 〈〈nyan@mail.uz〉〉 〈〈nya@mail.uz〉〉 https://nyan.com go'zal 〈@crystalny〉";
+        let expected = "@ki-d @ki- 〈@hello〉 〈nyan@mail.uz〉 〈nya@mail.uz〉 https://nyan.com go'zal 〈@crystalny〉";
 
         assert_eq!(wrap_regex(input, pattern), expected.to_string());
 
@@ -75,4 +75,4 @@ mod as_tests {
 
         assert_eq!(wrap_regex(input, pattern), expected.to_string());
     }
-}*/
+}
