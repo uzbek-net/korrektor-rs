@@ -5,10 +5,10 @@ use pcre::MatchIterator;
 /// Replaces constants represented as a tuple array. Each first
 /// element of the tuple replaces each second element
 /// with the help of the regex crate.
-pub fn replace_pairs(input: &str, constant: Box<[(&str, &str)]>) -> String {
+pub fn replace_pairs(input: &str, constant: &[(&str, &str)]) -> String {
     let mut input = input.to_string();
 
-    for (pattern, replacement) in constant.as_ref() {
+    for (pattern, replacement) in constant {
         let re = regex::Regex::new(pattern).unwrap();
         input = re.replace_all(&input, *replacement).as_ref().to_string();
     }
