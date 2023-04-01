@@ -123,7 +123,6 @@ fn get_value(value: char) -> Result<usize, KorrektorError> {
         return match constants::CHAR_ORDER.iter().position(|&r| r == value.to_string()) {
             Some(num) => Ok(num),
             None => Err(KorrektorError::InvalidChar(value))
-            // panic!("Error in usort: char {value} is not found and can not be sorted")
         };
     }
 }
