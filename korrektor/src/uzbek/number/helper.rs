@@ -1,4 +1,5 @@
 use korrektor_utils;
+use crate::error::KorrektorError;
 use crate::uzbek::number::{float_to_word, integer_to_word};
 
 pub(super) fn is_valid_integer(number: &str) -> bool {
@@ -42,30 +43,30 @@ pub(super) fn wrap_phones(input : &str) -> String {
     korrektor_utils::wrap_matches(input, matches)
 }
 
-pub(super) fn convert_floats(text: &str) -> String {
+pub(super) fn convert_floats(text: &str) -> Result<String, KorrektorError> {
     let mut result = text.to_string();
     let re = fancy_regex::Regex::new(r"(\d+\.\d+)").unwrap();
 
     for capture in re.captures_iter(text) {
         let capture = capture.unwrap()[0].to_string();
 
-        result = result.replace(&capture, &float_to_word(&capture));
+        result = result.replace(&capture, &float_to_word(&capture)?);
     }
 
-    result
+    Ok(result)
 }
 
-pub(super) fn convert_integers(text: &str) -> String {
+pub(super) fn convert_integers(text: &str) -> Result<String, KorrektorError> {
     let mut result = text.to_string();
     let re = fancy_regex::Regex::new(r"(\d+)").unwrap();
 
     for capture in re.captures_iter(text) {
         let capture = capture.unwrap()[0].to_string();
 
-        result = result.replace(&capture, &integer_to_word(&capture));
+        result = result.replace(&capture, &integer_to_word(&capture)?);
     }
 
-    result
+    Ok(result)
 }
 
 #[cfg(test)]
@@ -90,6 +91,6 @@ mod as_tests {
 
     #[test]
     fn convert_floats_test(){
-        assert_eq!(convert_floats("12 12.5 13.1 5"), "12 o‘n ikki butun o‘ndan besh o‘n uch butun o‘ndan bir 5".to_string());
+        assert_eq!(convert_floats("12 12.5 13.1 5").unwrap(), "12 o‘n ikki butun o‘ndan besh o‘n uch butun o‘ndan bir 5".to_string());
     }
 }
