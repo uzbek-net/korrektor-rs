@@ -1,7 +1,8 @@
 //! Error type for korrektor.
 use std::fmt::{Display, Formatter};
+use serde::{Serialize, Deserialize};
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum KorrektorError{
     InvalidChar(char),
     InvalidNumber(String, String),
