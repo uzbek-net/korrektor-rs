@@ -1,3 +1,4 @@
+//! Error type for korrektor.
 use std::fmt::{Display, Formatter};
 
 #[derive(Debug)]
