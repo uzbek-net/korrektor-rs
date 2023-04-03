@@ -21,6 +21,10 @@ jobs:
           toolchain: stable
           override: true
 
-      - run: cargo publish --token ${CRATES_TOKEN}
+      - run: cargo publish -p korrektor --token ${CRATES_TOKEN}
+        env:
+          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
+
+      - run: cargo publish -p korrektor-utils --token ${CRATES_TOKEN}
         env:
           CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
