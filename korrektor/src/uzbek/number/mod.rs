@@ -37,33 +37,30 @@ pub fn integer_to_word(number: &str) -> Result<String, KorrektorError> {
 
     let number: i64 = number.parse().unwrap();
 
-    //find number to word in constants 0 to 19
-    if number == 0 {
-        return Ok(String::from("nol"));
-    } else if number < 20 {
-        let index = (number - 1) as usize;
-        return Ok(constants::NUM_1_TO_19[index].1.to_string())
-    }
-    // find number to word from 0 to 100
-    else if number < 100 {
-        let index: usize = (number / 10 - 2) as usize;
-        return Ok(constants::TEEN[index].1.to_string() + " " + &integer_to_word(&(number % 10).to_string())?)
-    }
-    // find number to word from 0 to 1000
-    else if number < i64::pow(10, 3) {
-        return one(number, 2)
-    }
+    match number {
+        0 => Ok(String::from("nol")),
+        1..=19 => {
+            let index = (number - 1) as usize;
+            Ok(constants::NUM_1_TO_19[index].1.to_string())
+        },
+        20..=99 => {
+            let index: usize = (number / 10 - 2) as usize;
+            Ok(constants::TEEN[index].1.to_string() + " " + &integer_to_word(&(number % 10).to_string())?)
+        },
+        100..=999 => one(number, 2),
+        _ => {
+            let mut i = 4;
+            while i < 27 {
+                if number < i64::pow(10, i) { break; }
+                i += 1;
+            }
 
-    let mut i = 4;
-    while i < 27 {
-        if number < i64::pow(10, i) { break; }
-        i += 1;
-    }
-
-    if i % 3 != 0 {
-        Ok(hundred(number, i - (i % 3))?)
-    } else {
-        Ok(one(number, i - 3)?)
+            if i % 3 != 0 {
+                Ok(hundred(number, i - (i % 3))?)
+            } else {
+                Ok(one(number, i - 3)?)
+            }
+        }
     }
 }
 
