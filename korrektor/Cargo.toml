@@ -22,3 +22,4 @@ fancy-regex = "0.11.0"
 pcre = "0.2.3"
 itertools = "0.10.5"
 korrektor-utils = "0.1.2"
+serde = { version="1.0", features = ["derive"]}
