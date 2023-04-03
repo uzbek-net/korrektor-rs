@@ -77,4 +77,15 @@ mod as_tests {
 
         assert_eq!(wrap_regex(input, pattern), expected.to_string());
     }
+
+    #[test]
+    fn replace_pairs_test() {
+        let pairs = &[
+            ("hi", "hello"),
+            ("123", "345"),
+            ("Yep", "Yes")
+        ];
+
+        assert_eq!(replace_pairs("hi 123, Yep", pairs), "hello 345, Yes".to_string());
+    }
 }
