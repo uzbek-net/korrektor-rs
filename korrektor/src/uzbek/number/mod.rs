@@ -82,7 +82,9 @@ pub fn integer_to_word(number: &str) -> Result<String, KorrektorError> {
 /// ```
 pub fn float_to_word(number: &str) -> Result<String, KorrektorError> {
     if !helper::is_valid_float(number) {
-        panic!("Invalid floating-point number: {number}");
+        return Err(KorrektorError::InvalidNumber(
+            number.to_string(), "Not a valid floating-point number".to_string())
+        )
     }
 
     let number: Vec<&str> = number.split('.').collect();
