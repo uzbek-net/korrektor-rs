@@ -1,24 +1,33 @@
 name: Test CI
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-env:
-  CARGO_TERM_COLOR: always
+on: [push, pull_request]
 
 jobs:
-  build:
-
+  test-flake:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Build
-        run: cargo build --verbose
-      - name: Run lint
-        run: cargo clippy --verbose
-      - name: Run tests
-        run: cargo test --verbose
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Check up flake configuration
+        run: nix flake check --all-systems --show-trace
+
+  test-project:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      # - name: Build project with Nix
+      # run: nix build
+
+      - name: Run cargo tests
+        run: nix develop --command -- cargo test

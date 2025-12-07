@@ -1,5 +1,5 @@
-use korrektor_utils;
 use crate::error::KorrektorError;
+use crate::utils::pcre as ipcre;
 use crate::uzbek::number::{float_to_word, integer_to_word};
 
 pub(super) fn is_valid_integer(number: &str) -> bool {
@@ -32,15 +32,18 @@ pub(super) fn wrap_ips(input: &str) -> String {
     let matches_ipv6 = re.matches(input);
 
     // wrapping with 〈〉 brackets
-    let result = korrektor_utils::wrap_matches(input, matches_ipv4);
-    korrektor_utils::wrap_matches(&result, matches_ipv6)
+    let result = ipcre::wrap_matches(input, matches_ipv4);
+    ipcre::wrap_matches(&result, matches_ipv6)
 }
 
-pub(super) fn wrap_phones(input : &str) -> String {
-    let mut re = pcre::Pcre::compile("(998)(90|91|93|94|95|97|98|99|50|88|69|70|71|72|77|33)([0-9]{3})([0-9]{2})([0-9]{2})").unwrap();
+pub(super) fn wrap_phones(input: &str) -> String {
+    let mut re = pcre::Pcre::compile(
+        "(998)(90|91|93|94|95|97|98|99|50|88|69|70|71|72|77|33)([0-9]{3})([0-9]{2})([0-9]{2})",
+    )
+    .unwrap();
     let matches = re.matches(input);
 
-    korrektor_utils::wrap_matches(input, matches)
+    ipcre::wrap_matches(input, matches)
 }
 
 pub(super) fn convert_floats(text: &str) -> Result<String, KorrektorError> {
@@ -75,7 +78,8 @@ mod as_tests {
 
     #[test]
     fn wrap_ips_test() {
-        let input = "12 124.34.5.234 12.3 2001:db8:3c4d:0015:0000:0000:1a2f:1a2b hello 2001:db8:3c4d:15::";
+        let input =
+            "12 124.34.5.234 12.3 2001:db8:3c4d:0015:0000:0000:1a2f:1a2b hello 2001:db8:3c4d:15::";
         let expected = "12 〈124.34.5.234〉 12.3 〈2001:db8:3c4d:0015:0000:0000:1a2f:1a2b〉 hello 〈2001:db8:3c4d:15::〉";
 
         assert_eq!(wrap_ips(input), expected.to_string());
@@ -90,7 +94,10 @@ mod as_tests {
     }
 
     #[test]
-    fn convert_floats_test(){
-        assert_eq!(convert_floats("12 12.5 13.1 5").unwrap(), "12 o‘n ikki butun o‘ndan besh o‘n uch butun o‘ndan bir 5".to_string());
+    fn convert_floats_test() {
+        assert_eq!(
+            convert_floats("12 12.5 13.1 5").unwrap(),
+            "12 o‘n ikki butun o‘ndan besh o‘n uch butun o‘ndan bir 5".to_string()
+        );
     }
 }

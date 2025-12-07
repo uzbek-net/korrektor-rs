@@ -26,13 +26,18 @@ in
       deadnix
       alejandra
 
-      # Rust
+      # Rust
       rustc
       cargo
       rustfmt
       clippy
       rust-analyzer
       cargo-watch
+
+      # Autotools
+      autoconf
+      automake
+      pkg-config
 
       # Other compile time dependencies
       pcre
@@ -60,6 +65,7 @@ in
     ];
 
     shellHook = ''
-      # Extra steps to do while activating development shell
+      # Fetch everything
+      git fetch
     '';
   }

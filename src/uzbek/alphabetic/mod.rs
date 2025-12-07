@@ -2,7 +2,7 @@
 //!
 //! Both cyrillic and latin modes can be used.
 use crate::error::KorrektorError;
-use korrektor_utils;
+use crate::utils::pcre;
 
 mod constants;
 
@@ -31,7 +31,7 @@ pub fn sort(text: &str) -> Result<String, KorrektorError> {
 fn to_sortable(text: String) -> String {
     let mut input: String = text;
 
-    input = korrektor_utils::replace_pairs(&input, constants::TO_SORT);
+    input = pcre::replace_pairs(&input, constants::TO_SORT);
 
     input
 }
@@ -39,7 +39,7 @@ fn to_sortable(text: String) -> String {
 fn from_sortable(text: String) -> String {
     let mut input: String = text;
 
-    input = korrektor_utils::replace_pairs(&input, constants::FROM_SORT);
+    input = pcre::replace_pairs(&input, constants::FROM_SORT);
 
     input
 }
@@ -50,11 +50,11 @@ fn usort(string1: &str, string2: &str) -> Result<i8, KorrektorError> {
     for i in 0..length {
         let char1 = match string1.chars().nth(i) {
             Some(char) => char,
-            None => panic!("Error in usort: no char at the index {i} in &str: {string1}")
+            None => panic!("Error in usort: no char at the index {i} in &str: {string1}"),
         };
         let char2 = match string2.chars().nth(i) {
             Some(char) => char,
-            None => panic!("Error in usort: no char at the index {i} in &str: {string2}")
+            None => panic!("Error in usort: no char at the index {i} in &str: {string2}"),
         };
 
         // get position of characters in the alphabet
@@ -104,14 +104,20 @@ fn sort_sortable(text: &str) -> Result<String, KorrektorError> {
 }
 
 fn is_exceptioned(value: char) -> bool {
-    if value == 'Ö' || value == 'Ü' { return true; }
+    if value == 'Ö' || value == 'Ü' {
+        return true;
+    }
 
     false
 }
 
 fn get_exceptioned_value(value: char) -> usize {
-    if value == 'Ö' { return 55; }
-    if value == 'Ü' { return 56; }
+    if value == 'Ö' {
+        return 55;
+    }
+    if value == 'Ü' {
+        return 56;
+    }
 
     0
 }
@@ -120,10 +126,13 @@ fn get_value(value: char) -> Result<usize, KorrektorError> {
     if is_exceptioned(value) {
         Ok(get_exceptioned_value(value))
     } else {
-        return match constants::CHAR_ORDER.iter().position(|&r| r == value.to_string()) {
+        match constants::CHAR_ORDER
+            .iter()
+            .position(|&r| r == value.to_string())
+        {
             Some(num) => Ok(num),
-            None => Err(KorrektorError::InvalidChar(value))
-        };
+            None => Err(KorrektorError::InvalidChar(value)),
+        }
     }
 }
 

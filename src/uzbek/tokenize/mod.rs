@@ -4,6 +4,7 @@
 //! for both latin and cyrillic modes.
 mod constants;
 
+use crate::utils::pcre as ipcre;
 use pcre::Pcre;
 use regex::Regex;
 
@@ -47,7 +48,9 @@ fn split_word(word: &str) -> String {
     // if found latin word
     for _ in matches {
         let key = constants::LATIN_EXP.iter().find(|k| k.0 == copy);
-        if let Some(pair) = key { return pair.1.to_string(); }
+        if let Some(pair) = key {
+            return pair.1.to_string();
+        }
 
         for pair in constants::REPLACE_LAT {
             let re = Regex::new(pair.0).unwrap();
@@ -62,7 +65,9 @@ fn split_word(word: &str) -> String {
     // if found cyrillic word
     for _ in matches {
         let key = constants::CYRILLIC_EXP.iter().find(|k| k.0 == copy);
-        if let Some(pair) = key { return pair.1.to_string(); }
+        if let Some(pair) = key {
+            return pair.1.to_string();
+        }
 
         for pair in constants::REPLACE_CYR {
             let re = Regex::new(pair.0).unwrap();
@@ -92,11 +97,11 @@ fn split_word(word: &str) -> String {
 }
 
 fn a_correct(text: &str) -> String {
-    korrektor_utils::replace_pairs(&text.to_lowercase(),constants::A_CORRECT)
+    ipcre::replace_pairs(&text.to_lowercase(), constants::A_CORRECT)
 }
 
 fn i_correct(text: &str) -> String {
-    korrektor_utils::replace_pairs(text,constants::I_CORRECT)
+    ipcre::replace_pairs(text, constants::I_CORRECT)
 }
 
 enum Split {
@@ -108,7 +113,7 @@ enum Split {
     No,
 }
 
-fn create_map(word: &String) -> Vec<i32> {
+fn create_map(word: &str) -> Vec<i32> {
     let mut text_map: Vec<i32> = Vec::new();
 
     if word.is_empty() {
@@ -118,8 +123,7 @@ fn create_map(word: &String) -> Vec<i32> {
     let mut vector: Vec<char> = word.chars().collect();
 
     for _ in 0..vector.len() {
-        match get_split(&vector)
-        {
+        match get_split(&vector) {
             Split::One => {
                 text_map.push(1);
                 vector = vector.split_off(1);
@@ -140,51 +144,98 @@ fn create_map(word: &String) -> Vec<i32> {
                 text_map.push(5);
                 vector = vector.split_off(5);
             }
-            Split::No => continue
+            Split::No => continue,
         }
     }
 
     text_map
 }
 
-fn get_split(vector: &Vec<char>) -> Split {
+fn get_split(vector: &[char]) -> Split {
     let mut result = Split::No;
-    if (letter(vector, 0) == 'V' && letter(vector, 1) != 'C') ||
-        (letter(vector, 0) == 'V' && letter(vector, 1) == 'C' && letter(vector, 2) == 'V') {
+    if (letter(vector, 0) == 'V' && letter(vector, 1) != 'C')
+        || (letter(vector, 0) == 'V' && letter(vector, 1) == 'C' && letter(vector, 2) == 'V')
+    {
         result = Split::One;
     }
-    if letter(vector, 0) == 'V' && letter(vector, 1) == 'C' && letter(vector, 2) != 'V' && letter(vector, 3) != 'C' {
+    if letter(vector, 0) == 'V'
+        && letter(vector, 1) == 'C'
+        && letter(vector, 2) != 'V'
+        && letter(vector, 3) != 'C'
+    {
         result = Split::Two;
     }
-    if letter(vector, 0) == 'V' && letter(vector, 1) == 'C' && letter(vector, 2) == 'C' && letter(vector, 3) != 'V' {
+    if letter(vector, 0) == 'V'
+        && letter(vector, 1) == 'C'
+        && letter(vector, 2) == 'C'
+        && letter(vector, 3) != 'V'
+    {
         result = Split::Three;
     }
-    if (letter(vector, 0) == 'C' && letter(vector, 1) == 'V' && letter(vector, 2) != 'C') ||
-        (letter(vector, 0) == 'C' && letter(vector, 1) == 'V' && letter(vector, 2) == 'C' && letter(vector, 3) == 'V') {
+    if (letter(vector, 0) == 'C' && letter(vector, 1) == 'V' && letter(vector, 2) != 'C')
+        || (letter(vector, 0) == 'C'
+            && letter(vector, 1) == 'V'
+            && letter(vector, 2) == 'C'
+            && letter(vector, 3) == 'V')
+    {
         result = Split::Two;
     }
-    if letter(vector, 0) == 'C' && letter(vector, 1) == 'V' && letter(vector, 2) == 'C' && letter(vector, 3) == 'C' && letter(vector, 4) == 'V'
-        || letter(vector, 0) == 'C' && letter(vector, 1) == 'V' && letter(vector, 2) == 'C' && letter(vector, 3) != 'C' && letter(vector, 3) != 'V' {
+    if letter(vector, 0) == 'C'
+        && letter(vector, 1) == 'V'
+        && letter(vector, 2) == 'C'
+        && letter(vector, 3) == 'C'
+        && letter(vector, 4) == 'V'
+        || letter(vector, 0) == 'C'
+            && letter(vector, 1) == 'V'
+            && letter(vector, 2) == 'C'
+            && letter(vector, 3) != 'C'
+            && letter(vector, 3) != 'V'
+    {
         result = Split::Three;
     }
-    if letter(vector, 0) == 'C' && letter(vector, 1) == 'V' && letter(vector, 2) == 'C' && letter(vector, 3) == 'C' && letter(vector, 4) != 'V' {
+    if letter(vector, 0) == 'C'
+        && letter(vector, 1) == 'V'
+        && letter(vector, 2) == 'C'
+        && letter(vector, 3) == 'C'
+        && letter(vector, 4) != 'V'
+    {
         result = Split::Four;
     }
-    if (letter(vector, 0) == 'C' && letter(vector, 1) == 'C' && letter(vector, 2) == 'V' && letter(vector, 3) != 'C') ||
-        (letter(vector, 0) == 'C' && letter(vector, 1) == 'C' && letter(vector, 2) == 'V' && letter(vector, 3) == 'C') && letter(vector, 4) == 'V' {
+    if (letter(vector, 0) == 'C'
+        && letter(vector, 1) == 'C'
+        && letter(vector, 2) == 'V'
+        && letter(vector, 3) != 'C')
+        || (letter(vector, 0) == 'C'
+            && letter(vector, 1) == 'C'
+            && letter(vector, 2) == 'V'
+            && letter(vector, 3) == 'C')
+            && letter(vector, 4) == 'V'
+    {
         result = Split::Three;
     }
-    if letter(vector, 0) == 'C' && letter(vector, 1) == 'C' && letter(vector, 2) == 'V' && letter(vector, 3) == 'C' && letter(vector, 4) != 'V' && letter(vector, 5) != 'C' {
+    if letter(vector, 0) == 'C'
+        && letter(vector, 1) == 'C'
+        && letter(vector, 2) == 'V'
+        && letter(vector, 3) == 'C'
+        && letter(vector, 4) != 'V'
+        && letter(vector, 5) != 'C'
+    {
         result = Split::Four;
     }
-    if letter(vector, 0) == 'C' && letter(vector, 1) == 'C' && letter(vector, 2) == 'V' && letter(vector, 3) == 'C' && letter(vector, 4) == 'C' && letter(vector, 5) != 'V' {
+    if letter(vector, 0) == 'C'
+        && letter(vector, 1) == 'C'
+        && letter(vector, 2) == 'V'
+        && letter(vector, 3) == 'C'
+        && letter(vector, 4) == 'C'
+        && letter(vector, 5) != 'V'
+    {
         result = Split::Five;
     }
 
     result
 }
 
-fn letter(word: &Vec<char>, i: usize) -> char {
+fn letter(word: &[char], i: usize) -> char {
     if i < word.len() {
         word[i]
     } else {
@@ -198,17 +249,23 @@ mod as_tests {
 
     #[test]
     fn a_correct_test() {
-        assert_eq!(a_correct(&String::from("G'g' O'o' ShSHsh ChCHch ʻʼ'‘’‛′ʽ`")), String::from("ğğ ŏŏ ššš ččč ʼʼʼʼʼʼʼʼʼ"));
+        assert_eq!(
+            a_correct(&String::from("G'g' O'o' ShSHsh ChCHch ʻʼ'‘’‛′ʽ`")),
+            String::from("ğğ ŏŏ ššš ččč ʼʼʼʼʼʼʼʼʼ")
+        );
     }
 
     #[test]
     fn i_correct_test() {
-        assert_eq!(i_correct(&String::from("ğ ŏ š č")), String::from("gʻ o‘ sh ch"));
+        assert_eq!(
+            i_correct(&String::from("ğ ŏ š č")),
+            String::from("gʻ o‘ sh ch")
+        );
     }
 
     #[test]
     fn create_map_test() {
-        assert_eq!(create_map(&"CVCCVCCVCVC".to_string()), vec![3, 3, 2, 3]);
+        assert_eq!(create_map("CVCCVCCVCVC"), vec![3, 3, 2, 3]);
     }
 
     #[test]
@@ -220,7 +277,10 @@ mod as_tests {
 
     #[test]
     fn split_text_test() {
-        assert_eq!(split_text("singil chiroyli чиройли"), "si-ngil chi-roy-li чи-рой-ли");
+        assert_eq!(
+            split_text("singil chiroyli чиройли"),
+            "si-ngil chi-roy-li чи-рой-ли"
+        );
         assert_eq!(split_text("singil"), "si-ngil");
         assert_eq!(split_text("chiroyli"), "chi-roy-li");
         assert_eq!(split_text("чиройли"), "чи-рой-ли");
