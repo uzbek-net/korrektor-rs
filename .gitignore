@@ -1,4 +1,15 @@
+# Rust
 target
 Cargo.lock
+
+# Jetbrains
 .idea
+
+# MacOS
 .DS_Store
+
+# Nix
+result/
+
+# Direnv
+.direnv

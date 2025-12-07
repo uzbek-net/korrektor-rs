@@ -1,5 +1,24 @@
-[workspace]
-members = [
-    "korrektor",
-    "korrektor-utils"
+[package]
+name = "korrektor"
+version = "0.3.1"
+edition = "2021"
+homepage = "https://github.com/uzbek-net/korrektor-rs"
+repository = "https://github.com/uzbek-net/korrektor-rs"
+description = "Library to work with Uzbek language text processing"
+authors = [
+    "Orzklv <sakhib@orzklv.uz> (https://orzklv.uz)",
+    "Kate Crystal <crystalnyan@icloud.com> (https://kate.moe)",
+    "Manuchehr Usmonov <yetimdasturchi@gmail.com> (https://manu.uno)"
 ]
+keywords = ["uzbek", "language", "korrektor", "text-processing"]
+readme = "../readme.md"
+categories = ["text-processing"]
+license = "MIT OR Apache-2.0"
+exclude = ["target", ".github"]
+
+[dependencies]
+regex = "1.7.0"
+fancy-regex = "0.11.0"
+pcre = "0.2.3"
+itertools = "0.10.5"
+serde = { version="1", features = ["derive"]}
