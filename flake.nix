@@ -24,6 +24,9 @@
         # Nix script formatter
         formatter = pkgs.alejandra;
 
+        # Output package
+        packages.default = pkgs.callPackage ./. {inherit pkgs;};
+
         # Development environment
         devShells.default = import ./shell.nix {inherit pkgs;};
       };
