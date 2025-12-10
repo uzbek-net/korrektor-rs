@@ -31,10 +31,10 @@ in
       lockFile = ./Cargo.lock;
       # Use this if you have dependencies from git instead
       # of crates.io in your Cargo.toml
-      # outputHashes = {
-      #   # Sha256 of the git repository, doesn't matter if it's monorepo
-      #   "example-0.1.0" = "sha256-80EwvwMPY+rYyti8DMG4hGEpz/8Pya5TGjsbOBF0P0c=";
-      # };
+      outputHashes = {
+        # Sha256 of the git repository, doesn't matter if it's monorepo
+        "korrektor-rspell-0.1.1" = "sha256-j8BI6SIGaZIrHO7n4r035exNGE54XPmmH+bJLaMKXAE=";
+      };
     };
 
     # Compile time dependencies
@@ -47,12 +47,13 @@ in
       # Other compile time dependencies
       pcre
       pcre2
+      openssl
     ];
 
     # Runtime dependencies which will be shipped
     # with nix package
     buildInputs = with pkgs; [
-      # openssl
+      openssl
       # libressl
     ];
 
@@ -65,11 +66,13 @@ in
       (mkLd pkgs.libiconv)
       (mkLd pkgs.pcre)
       (mkLd pkgs.pcre2)
+      (mkLd pkgs.openssl)
     ];
     LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
       pkgs.libiconv
       pkgs.pcre
       pkgs.pcre2
+      pkgs.openssl
     ];
 
     meta = with lib; {
