@@ -11,6 +11,7 @@
 }: let
   # Helpful nix function
   getLibFolder = pkg: "${pkg}/lib";
+  mkLd = pkg: "-L${(getLibFolder pkg)}";
 
   # Manifest
   manifest = (pkgs.lib.importTOML ./Cargo.toml).package;
@@ -42,12 +43,13 @@ in
       # Other compile time dependencies
       pcre
       pcre2
+      openssl
     ];
 
     # Runtime dependencies which will be in present
     # after activation
     buildInputs = with pkgs; [
-      # openssl
+      openssl
       # libressl
     ];
 
@@ -57,7 +59,10 @@ in
 
     # Compiler LD variables
     # > Make sure packages have /lib or /include path'es
-    NIX_LDFLAGS = "-L${(getLibFolder pkgs.libiconv)}";
+    NIX_LDFLAGS = pkgs.lib.strings.concatStringsSep " " [
+      (mkLd pkgs.pcre)
+      (mkLd pkgs.pcre2)
+    ];
     LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
       pkgs.libiconv
       pkgs.pcre

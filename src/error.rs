@@ -1,12 +1,12 @@
 //! Error type for korrektor.
+use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
-use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Serialize, Deserialize)]
-pub enum KorrektorError{
+pub enum KorrektorError {
     InvalidChar(char),
     InvalidNumber(String, String),
-    NumberOverflow(String, String)
+    NumberOverflow(String, String),
 }
 
 impl Display for KorrektorError {

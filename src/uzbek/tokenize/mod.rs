@@ -2,7 +2,7 @@
 //!
 //! Implemented according to grammar rules
 //! for both latin and cyrillic modes.
-mod constants;
+mod prelude;
 
 use crate::utils::pcre as ipcre;
 use pcre::Pcre;
@@ -47,12 +47,12 @@ fn split_word(word: &str) -> String {
 
     // if found latin word
     for _ in matches {
-        let key = constants::LATIN_EXP.iter().find(|k| k.0 == copy);
+        let key = prelude::LATIN_EXP.iter().find(|k| k.0 == copy);
         if let Some(pair) = key {
             return pair.1.to_string();
         }
 
-        for pair in constants::REPLACE_LAT {
+        for pair in prelude::REPLACE_LAT {
             let re = Regex::new(pair.0).unwrap();
             result = re.replace_all(&result, pair.1).as_ref().to_string();
         }
@@ -64,12 +64,12 @@ fn split_word(word: &str) -> String {
 
     // if found cyrillic word
     for _ in matches {
-        let key = constants::CYRILLIC_EXP.iter().find(|k| k.0 == copy);
+        let key = prelude::CYRILLIC_EXP.iter().find(|k| k.0 == copy);
         if let Some(pair) = key {
             return pair.1.to_string();
         }
 
-        for pair in constants::REPLACE_CYR {
+        for pair in prelude::REPLACE_CYR {
             let re = Regex::new(pair.0).unwrap();
             result = re.replace_all(&result, pair.1).as_ref().to_string();
         }
@@ -97,11 +97,11 @@ fn split_word(word: &str) -> String {
 }
 
 fn a_correct(text: &str) -> String {
-    ipcre::replace_pairs(&text.to_lowercase(), constants::A_CORRECT)
+    ipcre::replace_pairs(&text.to_lowercase(), prelude::A_CORRECT)
 }
 
 fn i_correct(text: &str) -> String {
-    ipcre::replace_pairs(text, constants::I_CORRECT)
+    ipcre::replace_pairs(text, prelude::I_CORRECT)
 }
 
 enum Split {

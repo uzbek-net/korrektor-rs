@@ -1,11 +1,11 @@
 //! Functions to return Uzbek word equivalent of numbers.
 //!
 //! Only latin mode supported currently.
-use fancy_regex;
 use crate::error::KorrektorError;
+use fancy_regex;
 
-mod constants;
 mod helper;
+mod prelude;
 
 /// Returns a word representation of a given integer number.
 ///
@@ -26,13 +26,15 @@ mod helper;
 pub fn integer_to_word(number: &str) -> Result<String, KorrektorError> {
     if !helper::is_valid_integer(number) {
         return Err(KorrektorError::InvalidNumber(
-            number.to_string(), "Not a valid integer".to_string())
-        )
+            number.to_string(),
+            "Not a valid integer".to_string(),
+        ));
     }
     if number.len() > 18 {
         return Err(KorrektorError::InvalidNumber(
-            number.to_string(), "Integer should not contain more than 18 digits".to_string())
-        )
+            number.to_string(),
+            "Integer should not contain more than 18 digits".to_string(),
+        ));
     }
 
     let number: i64 = number.parse().unwrap();
@@ -41,17 +43,21 @@ pub fn integer_to_word(number: &str) -> Result<String, KorrektorError> {
         0 => Ok(String::from("nol")),
         1..=19 => {
             let index = (number - 1) as usize;
-            Ok(constants::NUM_1_TO_19[index].1.to_string())
-        },
+            Ok(prelude::NUM_1_TO_19[index].1.to_string())
+        }
         20..=99 => {
             let index: usize = (number / 10 - 2) as usize;
-            Ok(constants::TEEN[index].1.to_string() + " " + &integer_to_word(&(number % 10).to_string())?)
-        },
+            Ok(prelude::TEEN[index].1.to_string()
+                + " "
+                + &integer_to_word(&(number % 10).to_string())?)
+        }
         100..=999 => one(number, 2),
         _ => {
             let mut i = 4;
             while i < 27 {
-                if number < i64::pow(10, i) { break; }
+                if number < i64::pow(10, i) {
+                    break;
+                }
                 i += 1;
             }
 
@@ -83,8 +89,9 @@ pub fn integer_to_word(number: &str) -> Result<String, KorrektorError> {
 pub fn float_to_word(number: &str) -> Result<String, KorrektorError> {
     if !helper::is_valid_float(number) {
         return Err(KorrektorError::InvalidNumber(
-            number.to_string(), "Not a valid floating-point number".to_string())
-        )
+            number.to_string(),
+            "Not a valid floating-point number".to_string(),
+        ));
     }
 
     let number: Vec<&str> = number.split('.').collect();
@@ -92,8 +99,9 @@ pub fn float_to_word(number: &str) -> Result<String, KorrektorError> {
     let fraction = number[1];
     if number[1].len() > 18 {
         return Err(KorrektorError::InvalidNumber(
-            number[1].to_string(), "Precision part should not contain more than 18 digits".to_string())
-        )
+            number[1].to_string(),
+            "Precision part should not contain more than 18 digits".to_string(),
+        ));
     }
 
     let fraction_prefix = get_fraction_prefix(fraction);
@@ -142,10 +150,10 @@ pub fn numbers_to_word(text: &str) -> Result<String, KorrektorError> {
 
 fn base(number: i64, power: u32) -> Result<String, KorrektorError> {
     let base = integer_to_word(&(number / i64::pow(10, power)).to_string())?;
-    let mult_tuple = constants::MULT.iter().find(|x| x.0 == power as i32);
+    let mult_tuple = prelude::MULT.iter().find(|x| x.0 == power as i32);
     let mult = match mult_tuple {
         Some(tuple) => tuple.1,
-        None => panic!("Such multiplication value is not found! power is {power}")
+        None => panic!("Such multiplication value is not found! power is {power}"),
     };
 
     Ok(base + " " + mult)
@@ -154,10 +162,17 @@ fn base(number: i64, power: u32) -> Result<String, KorrektorError> {
 fn one(number: i64, power: u32) -> Result<String, KorrektorError> {
     let y = number % i64::pow(10, power);
     let s = integer_to_word(&y.to_string())?;
-    let separator =
-        if power == 2 && !s.is_empty() { " " } else if y < 100 {
-            if y == 0 { "" } else { " " }
-        } else { " " };
+    let separator = if power == 2 && !s.is_empty() {
+        " "
+    } else if y < 100 {
+        if y == 0 {
+            ""
+        } else {
+            " "
+        }
+    } else {
+        " "
+    };
 
     Ok(base(number, power)? + separator + &s)
 }
@@ -165,18 +180,23 @@ fn one(number: i64, power: u32) -> Result<String, KorrektorError> {
 fn hundred(number: i64, power: u32) -> Result<String, KorrektorError> {
     let y = number % i64::pow(10, power);
     let sep = if y < 100 {
-        if y == 0 { "" } else { " " }
-    } else { " " };
+        if y == 0 {
+            ""
+        } else {
+            " "
+        }
+    } else {
+        " "
+    };
 
     Ok(String::new() + &base(number, power)? + sep + &integer_to_word(&y.to_string())?)
 }
 
 fn get_fraction_prefix(number: &str) -> String {
-    let prefix = constants::FLOAT_PREFIX[number.len() - 1];
+    let prefix = prelude::FLOAT_PREFIX[number.len() - 1];
 
     prefix.to_string()
 }
-
 
 #[cfg(test)]
 mod as_tests {
@@ -194,7 +214,10 @@ mod as_tests {
 
     #[test]
     fn hundred_test() {
-        assert_eq!(hundred(3456, 3).unwrap(), String::from("uch ming to‘rt yuz ellik olti"));
+        assert_eq!(
+            hundred(3456, 3).unwrap(),
+            String::from("uch ming to‘rt yuz ellik olti")
+        );
     }
 
     #[test]
@@ -202,17 +225,38 @@ mod as_tests {
         assert_eq!(integer_to_word("0").unwrap(), String::from("nol"));
         assert_eq!(integer_to_word("9").unwrap(), String::from("to‘qqiz"));
         assert_eq!(integer_to_word("32").unwrap(), String::from("o‘ttiz ikki"));
-        assert_eq!(integer_to_word("104").unwrap(), String::from("bir yuz to‘rt"));
-        assert_eq!(integer_to_word("1024").unwrap(), String::from("bir ming yigirma to‘rt"));
-        assert_eq!(integer_to_word("3456").unwrap(), String::from("uch ming to‘rt yuz ellik olti"));
+        assert_eq!(
+            integer_to_word("104").unwrap(),
+            String::from("bir yuz to‘rt")
+        );
+        assert_eq!(
+            integer_to_word("1024").unwrap(),
+            String::from("bir ming yigirma to‘rt")
+        );
+        assert_eq!(
+            integer_to_word("3456").unwrap(),
+            String::from("uch ming to‘rt yuz ellik olti")
+        );
     }
 
     #[test]
     fn float_test() {
-        assert_eq!(float_to_word("3.0").unwrap(), String::from("uch butun o‘ndan nol"));
-        assert_eq!(float_to_word("3.75").unwrap(), String::from("uch butun yuzdan yetmish besh"));
-        assert_eq!(float_to_word("3.754").unwrap(), String::from("uch butun mingdan yetti yuz ellik to‘rt"));
-        assert_eq!(float_to_word("3.7548").unwrap(), String::from("uch butun o‘n mingdan yetti ming besh yuz qirq sakkiz"))
+        assert_eq!(
+            float_to_word("3.0").unwrap(),
+            String::from("uch butun o‘ndan nol")
+        );
+        assert_eq!(
+            float_to_word("3.75").unwrap(),
+            String::from("uch butun yuzdan yetmish besh")
+        );
+        assert_eq!(
+            float_to_word("3.754").unwrap(),
+            String::from("uch butun mingdan yetti yuz ellik to‘rt")
+        );
+        assert_eq!(
+            float_to_word("3.7548").unwrap(),
+            String::from("uch butun o‘n mingdan yetti ming besh yuz qirq sakkiz")
+        )
     }
 
     #[test]

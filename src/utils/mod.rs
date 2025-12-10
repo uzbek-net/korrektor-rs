@@ -2,3 +2,4 @@
 pub mod duplicates;
 pub mod frequency;
 pub mod pcre;
+pub mod wrappers;

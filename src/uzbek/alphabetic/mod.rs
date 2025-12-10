@@ -4,7 +4,7 @@
 use crate::error::KorrektorError;
 use crate::utils::pcre;
 
-mod constants;
+mod prelude;
 
 /// Sorts words in alphabetically ascending order.
 ///
@@ -31,7 +31,7 @@ pub fn sort(text: &str) -> Result<String, KorrektorError> {
 fn to_sortable(text: String) -> String {
     let mut input: String = text;
 
-    input = pcre::replace_pairs(&input, constants::TO_SORT);
+    input = pcre::replace_pairs(&input, prelude::TO_SORT);
 
     input
 }
@@ -39,7 +39,7 @@ fn to_sortable(text: String) -> String {
 fn from_sortable(text: String) -> String {
     let mut input: String = text;
 
-    input = pcre::replace_pairs(&input, constants::FROM_SORT);
+    input = pcre::replace_pairs(&input, prelude::FROM_SORT);
 
     input
 }
@@ -126,7 +126,7 @@ fn get_value(value: char) -> Result<usize, KorrektorError> {
     if is_exceptioned(value) {
         Ok(get_exceptioned_value(value))
     } else {
-        match constants::CHAR_ORDER
+        match prelude::CHAR_ORDER
             .iter()
             .position(|&r| r == value.to_string())
         {

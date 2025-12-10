@@ -26,6 +26,21 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@main
 
+      - name: Fetch latest uzbek dictionaries
+        uses: actions/checkout@v4
+        with:
+          repository: "uzbek-net/uz-hunspell"
+          path: dict
+
+      - name: Install hunspell dictionaries
+        run: |
+          sudo rm -rf /usr/share/hunspell
+          sudo mkdir -p /usr/share/hunspell
+          sudo cp ./dict/uz_UZ.aff uz-cyr.aff
+          sudo cp ./dict/uz_UZ.dic uz-cyr.dic
+          sudo cp ./dict/uz_UZ_Cyrl.aff uz-lat.aff
+          sudo cp ./dict/uz_UZ_Cyrl.dic uz-lat.dic
+
       - name: Build project with Nix
         run: nix build
 
