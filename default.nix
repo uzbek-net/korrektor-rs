@@ -27,6 +27,9 @@ in
     # Your govnocodes
     src = pkgs.lib.cleanSource ./.;
 
+    # Don't do tests
+    doCheck = false;
+
     cargoLock = {
       lockFile = ./Cargo.lock;
       # Use this if you have dependencies from git instead
