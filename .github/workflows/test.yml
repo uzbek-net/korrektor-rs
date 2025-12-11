@@ -36,10 +36,10 @@ jobs:
         run: |
           sudo rm -rf /usr/share/hunspell
           sudo mkdir -p /usr/share/hunspell
-          sudo cp ./dict/uz_UZ.aff uz-cyr.aff
-          sudo cp ./dict/uz_UZ.dic uz-cyr.dic
-          sudo cp ./dict/uz_UZ_Cyrl.aff uz-lat.aff
-          sudo cp ./dict/uz_UZ_Cyrl.dic uz-lat.dic
+          sudo cp ./dict/uz_UZ.aff /usr/share/uz-cyr.aff
+          sudo cp ./dict/uz_UZ.dic /usr/share/uz-cyr.dic
+          sudo cp ./dict/uz_UZ_Cyrl.aff /usr/share/uz-lat.aff
+          sudo cp ./dict/uz_UZ_Cyrl.dic /usr/share/uz-lat.dic
 
       - name: Build project with Nix
         run: nix build
